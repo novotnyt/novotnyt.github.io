@@ -20,12 +20,10 @@
 
 
 title: Tomáš Novotný
-email: your-email@example.com
+email: tomas.novotny@rwth-aachen.de
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
-baseurl: "" # the subpath of your site, e.g. /blog
+  A MSc student of Computer Science at RWTH Aachen University with interests in logics,
+  machine learning, and cryptography. A passionate musician and a speedcuber.
 url: "https://novotnyt.github.io"
 # twitter_username: jekyllrb
 # github_username:  jekyll
