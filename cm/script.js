@@ -75,7 +75,7 @@ composerButton.addEventListener('click', renderByComposer);
 
 // Render view grouped by composer
 const renderByComposer = () => {
-    const container = document.getElementById('container');
+    const container = document.getElementById('concerts-container');
     container.innerHTML = '';
   
     const composers = new Set(concertsData.map((concert) => concert.composer));
