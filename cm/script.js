@@ -126,5 +126,5 @@ renderByComposer();
 };
 
 // Add event listener to "Grouped by Composer" button
-const composerButton = document.getElementById('composer-button');
+const composerButton = document.getElementById('by-composer');
 composerButton.addEventListener('click', renderByComposer);
