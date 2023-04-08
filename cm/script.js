@@ -138,21 +138,3 @@ const renderByComposer = () => {
       container.appendChild(collapsible);
     }
   };
-
-// Switch between views
-const byDateButton = document.getElementById('by-date');
-const byComposerButton = document.getElementById('by-composer');
-
-byDateButton.onclick = () => {
-byDateButton.classList.add('active');
-byComposerButton.classList.remove('active');
-renderByDate();
-};
-
-byComposerButton.addEventListener('click', renderByComposer);
-
-//byComposerButton.onclick = () => {
-//byDateButton.classList.remove('active');
-//byComposerButton.classList.add('active');
-//renderByComposer();
-//};
