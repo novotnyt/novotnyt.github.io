@@ -120,8 +120,8 @@ const renderByComposer = () => {
 };
 
 // Switch between views
-const byDateButton = document.getElementById('by-date-button');
-const byComposerButton = document.getElementById('by-composer-button');
+const byDateButton = document.getElementById('by-date');
+const byComposerButton = document.getElementById('by-composer');
 
 byDateButton.onclick = () => {
 byDateButton.classList.add('active');
