@@ -14,7 +14,7 @@ let concertsData = [];
 loadCSVData(csvFilePath, csvDelimiter)
   .then(data => {
     concertsData = data;
-    renderByDate();
+    renderByComposer();
     // add button event listeners after data has been loaded
     Promise.all([
       byDateButton.addEventListener('click', () => {
