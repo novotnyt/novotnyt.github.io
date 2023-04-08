@@ -68,55 +68,45 @@ const renderByDate = () => {
   }
 };
 
-// Render view by composer
+// Render view grouped by composer
 const renderByComposer = () => {
-  const container = document.getElementById('concerts-container');
-  container.innerHTML = '';
-
-  const concertsByComposer = {};
-
-  for (const [date, composer, piece] of concertsData) {
-    if (!concertsByComposer[composer]) {
-      concertsByComposer[composer] = {};
-    }
-    if (!concertsByComposer[composer][piece]) {
-      concertsByComposer[composer][piece] = [];
-    }
-    concertsByComposer[composer][piece].push(date);
-  }
-
-  for (const composer in concertsByComposer) {
-    const pieces = concertsByComposer[composer];
-    const composerContainer = document.createElement('div');
-    composerContainer.className = 'composer';
-    composerContainer.textContent = composer;
-    composerContainer.onclick = () => {
-      composerContainer.classList.toggle('active');
-      const collapsible = composerContainer.nextElementSibling;
-      collapsible.classList.toggle('active');
-    };
-    container.appendChild(composerContainer);
-
-    const collapsible = document.createElement('div');
-    collapsible.className = 'collapsible';
-    for (const piece in pieces) {
-      const dates = pieces[piece];
-      const pieceContainer = document.createElement('div');
-      pieceContainer.className = 'piece';
-      pieceContainer.textContent = piece;
-      pieceContainer.onclick = () => {
-        pieceContainer.classList.toggle('active');
-        const collapsibleItem = pieceContainer.nextElementSibling;
+    const container = document.getElementById('container');
+    container.innerHTML = '';
+  
+    const composers = new Set(concertsData.map((concert) => concert.composer));
+    for (const composer of composers) {
+      const piecesByComposer = concertsData.filter((concert) => concert.composer === composer).map((concert) => concert.piece);
+      const collapsible = document.createElement('div');
+      collapsible.className = 'collapsible';
+  
+      const composerContainer = document.createElement('div');
+      composerContainer.className = 'composer-container';
+      composerContainer.textContent = composer;
+      composerContainer.onclick = () => {
+        const collapsibleItem = composerContainer.nextElementSibling;
         collapsibleItem.classList.toggle('active');
+      };
+      collapsible.appendChild(composerContainer);
+  
+      for (const piece of piecesByComposer) {
+        const datesByPiece = concertsData.filter((concert) => concert.piece === piece).map((concert) => concert.date);
+        const pieceItem = document.createElement('div');
+        pieceItem.className = 'piece-item';
+        pieceItem.textContent = piece;
+        pieceItem.onclick = (event) => {
+          event.stopPropagation();
+          const collapsibleItem = pieceItem.nextElementSibling;
+          collapsibleItem.classList.toggle('active');
         };
-      collapsible.appendChild(pieceContainer);
-      const collapsibleItem = document.createElement('div');
-      collapsibleItem.className = 'collapsible-item';
-      collapsibleItem.textContent = `Played on: ${dates.join(', ')}`;
-      pieceContainer.insertAdjacentElement('afterend', collapsibleItem);
+        collapsible.appendChild(pieceItem);
+  
+        const collapsibleItem = document.createElement('div');
+        collapsibleItem.className = 'collapsible-item';
+        collapsibleItem.textContent = `Played on: ${datesByPiece.join(', ')}`;
+        pieceItem.insertAdjacentElement('afterend', collapsibleItem);
       }
-    container.appendChild(collapsible);
-  }
+      container.appendChild(collapsible);
+    }
 };
 
 // Switch between views
@@ -134,3 +124,7 @@ byDateButton.classList.remove('active');
 byComposerButton.classList.add('active');
 renderByComposer();
 };
+
+// Add event listener to "Grouped by Composer" button
+const composerButton = document.getElementById('composer-button');
+composerButton.addEventListener('click', renderByComposer);
