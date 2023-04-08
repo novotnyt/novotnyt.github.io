@@ -87,6 +87,7 @@ const renderByDate = () => {
 
 // Render view grouped by composer
 const renderByComposer = () => {
+    print("ahoj")
     const container = document.getElementById('concerts-container');
     container.innerHTML = '';
   
@@ -148,8 +149,10 @@ byComposerButton.classList.remove('active');
 renderByDate();
 };
 
-byComposerButton.onclick = () => {
-byDateButton.classList.remove('active');
-byComposerButton.classList.add('active');
-renderByComposer();
-};
+byComposerButton.addEventListener('click', renderByComposer);
+
+//byComposerButton.onclick = () => {
+//byDateButton.classList.remove('active');
+//byComposerButton.classList.add('active');
+//renderByComposer();
+//};
