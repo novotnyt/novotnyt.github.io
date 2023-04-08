@@ -15,10 +15,26 @@ loadCSVData(csvFilePath, csvDelimiter)
   .then(data => {
     concertsData = data;
     renderByDate();
+    // add button event listeners after data has been loaded
+    Promise.all([
+      byDateButton.addEventListener('click', () => {
+        byDateButton.classList.add('active');
+        byComposerButton.classList.remove('active');
+        renderByDate();
+      }),
+      byComposerButton.addEventListener('click', () => {
+        byDateButton.classList.remove('active');
+        byComposerButton.classList.add('active');
+        renderByComposer();
+      })
+    ]).catch(err => {
+      console.error(err);
+    });
   })
   .catch(err => {
     console.error(err);
   });
+
 
 // Render view by date
 const renderByDate = () => {
