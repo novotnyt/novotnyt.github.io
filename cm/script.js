@@ -68,10 +68,6 @@ const renderByDate = () => {
   }
 };
 
-// Add event listener to "Grouped by Composer" button
-const composerButton = document.getElementById('by-composer');
-composerButton.addEventListener('click', renderByComposer);
-
 
 // Render view grouped by composer
 const renderByComposer = () => {
