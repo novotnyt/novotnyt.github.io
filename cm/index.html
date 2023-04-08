@@ -1,71 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Concerts</title>
-</head>
-<body>
-	<h2>Grouped by Concert Date</h2>
-	<div id="grouped-by-concert-date"></div>
-	<h2>Grouped by Composer</h2>
-	<div id="grouped-by-composer"></div>
+  <head>
+    <meta charset="UTF-8">
+    <title>Concerts</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <h1>Concerts</h1>
+    <div class="view-switcher">
+      <button class="active" id="by-date">Grouped by Concert Dates</button>
+      <button id="by-composer">Grouped by Composer</button>
+    </div>
+    <div id="concerts-container"></div>
 
-	<script>
-		// Read CSV file and parse data
-		fetch('concerts.csv')
-			.then(response => response.text())
-			.then(text => {
-				let rows = text.split('\n').map(row => row.split(','));
-				let data = {};
-				rows.forEach(row => {
-					let date = row[0];
-					let composer = row[1];
-					let piece = row[2];
-					if (!data[date]) {
-						data[date] = [];
-					}
-					data[date].push({composer, piece});
-				});
-
-				// Display grouped by concert date view
-				let groupedByConcertDate = document.getElementById('grouped-by-concert-date');
-				Object.entries(data).forEach(([date, pieces]) => {
-					let div = document.createElement('div');
-					let h3 = document.createElement('h3');
-					h3.innerText = date;
-					div.appendChild(h3);
-					pieces.forEach(piece => {
-						let p = document.createElement('p');
-						p.innerText = `${piece.composer}: ${piece.piece}`;
-						div.appendChild(p);
-					});
-					groupedByConcertDate.appendChild(div);
-				});
-
-				// Display grouped by composer view
-				let groupedByComposer = document.getElementById('grouped-by-composer');
-				let composers = {};
-				Object.entries(data).forEach(([date, pieces]) => {
-					pieces.forEach(piece => {
-						let composer = piece.composer;
-						if (!composers[composer]) {
-							composers[composer] = [];
-						}
-						composers[composer].push({piece: piece.piece, date: date});
-					});
-				});
-				Object.entries(composers).forEach(([composer, pieces]) => {
-					let div = document.createElement('div');
-					let h3 = document.createElement('h3');
-					h3.innerText = composer;
-					div.appendChild(h3);
-					pieces.forEach(piece => {
-						let p = document.createElement('p');
-						p.innerText = `${piece.piece} (${piece.date})`;
-						div.appendChild(p);
-					});
-					groupedByComposer.appendChild(div);
-				});
-			});
-	</script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
