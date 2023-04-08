@@ -68,14 +68,31 @@ const renderByDate = () => {
   }
 };
 
+// Add event listener to "Grouped by Composer" button
+const composerButton = document.getElementById('by-composer');
+composerButton.addEventListener('click', renderByComposer);
+
+
 // Render view grouped by composer
 const renderByComposer = () => {
     const container = document.getElementById('container');
     container.innerHTML = '';
   
     const composers = new Set(concertsData.map((concert) => concert.composer));
+    const groupedData = {};
+    
+    // Group concerts data by composer and piece
     for (const composer of composers) {
-      const piecesByComposer = concertsData.filter((concert) => concert.composer === composer).map((concert) => concert.piece);
+      const piecesByComposer = new Set(concertsData.filter((concert) => concert.composer === composer).map((concert) => concert.piece));
+      for (const piece of piecesByComposer) {
+        groupedData[composer] = groupedData[composer] || {};
+        groupedData[composer][piece] = concertsData.filter((concert) => concert.composer === composer && concert.piece === piece).map((concert) => concert.date);
+      }
+    }
+  
+    // Render grouped data
+    for (const composer in groupedData) {
+      const piecesByComposer = Object.keys(groupedData[composer]);
       const collapsible = document.createElement('div');
       collapsible.className = 'collapsible';
   
@@ -89,7 +106,7 @@ const renderByComposer = () => {
       collapsible.appendChild(composerContainer);
   
       for (const piece of piecesByComposer) {
-        const datesByPiece = concertsData.filter((concert) => concert.piece === piece).map((concert) => concert.date);
+        const datesByPiece = groupedData[composer][piece];
         const pieceItem = document.createElement('div');
         pieceItem.className = 'piece-item';
         pieceItem.textContent = piece;
@@ -107,7 +124,7 @@ const renderByComposer = () => {
       }
       container.appendChild(collapsible);
     }
-};
+  };
 
 // Switch between views
 const byDateButton = document.getElementById('by-date');
@@ -124,7 +141,3 @@ byDateButton.classList.remove('active');
 byComposerButton.classList.add('active');
 renderByComposer();
 };
-
-// Add event listener to "Grouped by Composer" button
-const composerButton = document.getElementById('by-composer');
-composerButton.addEventListener('click', renderByComposer);
