@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Concerts</title>
+	<style>
+		/* CSS styling for the table */
+		table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		th, td {
+			text-align: left;
+			padding: 8px;
+			border: 1px solid #ddd;
+		}
+
+		th {
+			background-color: #f2f2f2;
+		}
+
+		/* CSS styling for the buttons */
+		.button {
+			background-color: #4CAF50; /* Green */
+			border: none;
+			color: white;
+			padding: 10px 20px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+		}
+
+		.active {
+			background-color: #008CBA; /* Add a darker blue color to the active button */
+		}
+	</style>
+</head>
+<body>
+	<div>
+		<button class="button active" onclick="groupedByConcert()">Grouped by Concert Date</button>
+		<button class="button" onclick="groupedByComposer()">Grouped by Composer</button>
+	</div>
+	<table id="table">
+		<thead>
+			<tr>
+				<th>Concert Date</th>
+				<th>Composer</th>
+				<th>Piece</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- Use PHP to read the CSV file and generate the table rows -->
+			<?php
+				$file = fopen("concerts.csv", "r");
+				while (($data = fgetcsv($file)) !== FALSE) {
+					echo "<tr>";
+					echo "<td>" . $data[0] . "</td>";
+					echo "<td>" . $data[1] . "</td>";
+					echo "<td>" . $data[2] . "</td>";
+					echo "</tr>";
+				}
+				fclose($file);
+			?>
+		</tbody>
+	</table>
+	<script>
+		// JavaScript code to toggle between the two view modes
+		function groupedByConcert() {
+			// Remove the "active" class from the "Grouped by Composer" button
+			document.getElementsByClassName("button")[1].classList.remove("active");
+			// Add the "active" class to the "Grouped by Concert Date" button
+			document.getElementsByClassName("button")[0].classList.add("active");
+			// Call a PHP script to read the CSV file and generate the grouped view
+			document.getElementById("table").innerHTML = "<?php include 'grouped_by_concert.php'; ?>";
+		}
+
+		function groupedByComposer() {
+			// Remove the "active" class from the "Grouped by Concert Date" button
+			document.getElementsByClassName("button")[0].classList.remove("active");
+			// Add the "active" class to the "Grouped by Composer" button
+			document.getElementsByClassName("button")[1].classList.add("active");
+			// Call a PHP script to read the CSV file and generate the grouped view
+			document.getElementById("table").innerHTML = "<?php include 'grouped_by_composer.php'; ?>";
+		}
+	</script>
+</body>
+</html>
