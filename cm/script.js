@@ -1,6 +1,10 @@
+// Switch between views
+const byDateButton = document.getElementById('by-date');
+const byComposerButton = document.getElementById('by-composer');
+
 // Load CSV data
 const csvFilePath = 'concerts.csv';
-const csvDelimiter = ',';
+const csvDelimiter = ';';
 
 const loadCSVData = async (csvFilePath, csvDelimiter) => {
   const response = await fetch(csvFilePath);
@@ -9,12 +13,13 @@ const loadCSVData = async (csvFilePath, csvDelimiter) => {
   return data;
 }
 
+
 let concertsData = [];
 
 loadCSVData(csvFilePath, csvDelimiter)
   .then(data => {
     concertsData = data;
-    renderByComposer();
+    renderByDate();
     // add button event listeners after data has been loaded
     Promise.all([
       byDateButton.addEventListener('click', () => {
@@ -38,103 +43,143 @@ loadCSVData(csvFilePath, csvDelimiter)
 
 // Render view by date
 const renderByDate = () => {
-  const container = document.getElementById('concerts-container');
-  container.innerHTML = '';
-
-  const concertsByDate = {};
-
-  for (const [date, composer, piece] of concertsData) {
-    if (!concertsByDate[date]) {
-      concertsByDate[date] = [];
-    }
-    concertsByDate[date].push({ composer, piece });
-  }
-
-  for (const date in concertsByDate) {
-    const concerts = concertsByDate[date];
-    const dateContainer = document.createElement('div');
-    dateContainer.className = 'concert-date';
-    dateContainer.textContent = date;
-    dateContainer.onclick = () => {
-      dateContainer.classList.toggle('active');
-      const collapsible = dateContainer.nextElementSibling;
-      collapsible.classList.toggle('active');
-    };
-    container.appendChild(dateContainer);
-
-    const collapsible = document.createElement('div');
-    collapsible.className = 'collapsible';
-    for (const { composer, piece } of concerts) {
-      const composerContainer = document.createElement('div');
-      composerContainer.className = 'composer';
-      composerContainer.textContent = composer;
-      composerContainer.onclick = () => {
-        composerContainer.classList.toggle('active');
-        const collapsibleItem = composerContainer.nextElementSibling;
-        collapsibleItem.classList.toggle('active');
-      };
-      collapsible.appendChild(composerContainer);
-
-      const collapsibleItem = document.createElement('div');
-      collapsibleItem.className = 'collapsible-item';
-      collapsibleItem.textContent = piece;
-      composerContainer.insertAdjacentElement('afterend', collapsibleItem);
-    }
-    container.appendChild(collapsible);
-  }
-};
-
-
-// Render view grouped by composer
-const renderByComposer = () => {
-    print("ahoj")
     const container = document.getElementById('concerts-container');
     container.innerHTML = '';
   
-    const composers = new Set(concertsData.map((concert) => concert.composer));
-    const groupedData = {};
-    
-    // Group concerts data by composer and piece
-    for (const composer of composers) {
-      const piecesByComposer = new Set(concertsData.filter((concert) => concert.composer === composer).map((concert) => concert.piece));
-      for (const piece of piecesByComposer) {
-        groupedData[composer] = groupedData[composer] || {};
-        groupedData[composer][piece] = concertsData.filter((concert) => concert.composer === composer && concert.piece === piece).map((concert) => concert.date);
+    const concertsByDate = {};
+  
+    for (const [date, composer, piece] of concertsData) {
+      if (!concertsByDate[date]) {
+        concertsByDate[date] = [];
       }
+      concertsByDate[date].push({ composer, piece });
     }
   
-    // Render grouped data
-    for (const composer in groupedData) {
-      const piecesByComposer = Object.keys(groupedData[composer]);
+    const decades = {}; // Group dates by decade
+    for (const date in concertsByDate) {
+      const year = parseInt(date.slice(-4));
+      const decade = Math.floor(year / 10) * 10;
+      if (!decades[decade]) {
+        decades[decade] = [];
+      }
+      decades[decade].push({ date, concerts: concertsByDate[date] });
+    }
+  
+    // Sort keys of decades object in descending order
+    const sortedDecades = Object.keys(decades).sort((a, b) => b - a);
+  
+    // Iterate through sorted decades keys
+    for (const decade of sortedDecades) {
+      const decadeContainer = document.createElement('div');
+      decadeContainer.className = 'decade';
+      const decadeHeader = document.createElement('div');
+      decadeHeader.className = 'decade-header';
+      decadeHeader.textContent = `${decade}s`;
+      decadeHeader.onclick = () => {
+        decadeHeader.classList.toggle('active');
+        const collapsible = decadeHeader.nextElementSibling;
+        collapsible.classList.toggle('active');
+      };
+      decadeContainer.appendChild(decadeHeader);
+  
       const collapsible = document.createElement('div');
       collapsible.className = 'collapsible';
-  
-      const composerContainer = document.createElement('div');
-      composerContainer.className = 'composer-container';
-      composerContainer.textContent = composer;
-      composerContainer.onclick = () => {
-        const collapsibleItem = composerContainer.nextElementSibling;
-        collapsibleItem.classList.toggle('active');
-      };
-      collapsible.appendChild(composerContainer);
-  
-      for (const piece of piecesByComposer) {
-        const datesByPiece = groupedData[composer][piece];
-        const pieceItem = document.createElement('div');
-        pieceItem.className = 'piece-item';
-        pieceItem.textContent = piece;
-        pieceItem.onclick = (event) => {
-          event.stopPropagation();
-          const collapsibleItem = pieceItem.nextElementSibling;
+      for (const { date, concerts } of decades[decade]) {
+        const dateContainer = document.createElement('div');
+        dateContainer.className = 'concert-date';
+        dateContainer.textContent = date;
+        dateContainer.onclick = () => {
+          dateContainer.classList.toggle('active');
+          const collapsibleItem = dateContainer.nextElementSibling;
           collapsibleItem.classList.toggle('active');
         };
-        collapsible.appendChild(pieceItem);
+        collapsible.appendChild(dateContainer);
   
         const collapsibleItem = document.createElement('div');
         collapsibleItem.className = 'collapsible-item';
-        collapsibleItem.textContent = `Played on: ${datesByPiece.join(', ')}`;
-        pieceItem.insertAdjacentElement('afterend', collapsibleItem);
+        for (const { composer, piece } of concerts) {
+          const composerContainer = document.createElement('div');
+          composerContainer.className = 'composer';
+          composerContainer.textContent = composer;
+          composerContainer.onclick = () => {
+            composerContainer.classList.toggle('active');
+            const pieceItem = composerContainer.nextElementSibling;
+            pieceItem.classList.toggle('active');
+          };
+          collapsibleItem.appendChild(composerContainer);
+  
+          const pieceItem = document.createElement('div');
+          pieceItem.className = 'piece';
+          pieceItem.textContent = piece;
+          composerContainer.insertAdjacentElement('afterend', pieceItem);
+        }
+        dateContainer.insertAdjacentElement('afterend', collapsibleItem);
       }
-      container.appendChild(collapsible);
+      decadeContainer.appendChild(collapsible);
+      container.appendChild(decadeContainer);
     }
   };
+  
+
+// Render view grouped by composer and piece
+const renderByComposer = () => {
+    const composerPieces = {};
+    concertsData.forEach((concert) => {
+      if (!composerPieces[concert[1]]) {
+        composerPieces[concert[1]] = {};
+      }
+      if (!composerPieces[concert[1]][concert[2]]) {
+        composerPieces[concert[1]][concert[2]] = [];
+      }
+      composerPieces[concert[1]][concert[2]].push(concert[0]);
+    });
+  
+    const container = document.getElementById('concerts-container');
+    container.innerHTML = "";
+  
+    // Get the sorted list of composers
+    const sortedComposers = Object.keys(composerPieces).sort((a, b) => {
+      // Extract the surname from the composer name
+      const surnameA = a.split(' ').pop();
+      const surnameB = b.split(' ').pop();
+      // Compare the surnames
+      return surnameA.localeCompare(surnameB);
+    });
+  
+    // Render the tables in alphabetical order by surname
+    sortedComposers.forEach((composer) => {
+      const composerTable = document.createElement("table");
+      composerTable.classList.add("composer-table");
+      const composerHeading = document.createElement("h2");
+      composerHeading.textContent = composer;
+      container.appendChild(composerHeading);
+      container.appendChild(composerTable);
+  
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      const pieceHeader = document.createElement("th");
+      pieceHeader.textContent = "Piece";
+      const dateHeader = document.createElement("th");
+      dateHeader.textContent = "Date";
+      headerRow.appendChild(pieceHeader);
+      headerRow.appendChild(dateHeader);
+      thead.appendChild(headerRow);
+      composerTable.appendChild(thead);
+  
+      for (const piece in composerPieces[composer]) {
+        const dateList = composerPieces[composer][piece];
+        const row = document.createElement("tr");
+        const pieceCell = document.createElement("td");
+        pieceCell.textContent = piece;
+        const dateCell = document.createElement("td");
+        dateCell.textContent = dateList.join(", ");
+        row.appendChild(pieceCell);
+        row.appendChild(dateCell);
+        composerTable.appendChild(row);
+      }
+    });
+  };
+  
+
+  
+  
